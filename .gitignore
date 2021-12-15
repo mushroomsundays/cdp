@@ -3,4 +3,4 @@ poc/*.json
 credentials.py
 app/email_addrs.py
 *.pyc
-app/*.log
+*.log
