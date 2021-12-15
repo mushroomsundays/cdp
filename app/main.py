@@ -16,7 +16,7 @@ logging.basicConfig(
 )
 
 CURRENCIES = ['bitcoin', 'ethereum', 'avalanche-2', 'terra-luna']
-DOC_NAME = 'DeFi Master'
+DOC_NAME = 'defi_master'
 SHEET = 'sheet1'
 MIN_HEALTH_FACTOR = 2
 
@@ -81,10 +81,11 @@ def main():
                         key_cell=price_coordinate,
                         value=new_price
                     )
-                    logging.info(f"{price_coordinate} updated to {new_price}")
+                    logging.info(f"{price_coordinate} updated to {new_price}. Sleeping for 3s...")
+                    time.sleep(3)
 
-        logging.info("Sleeping for 60 seconds...")
-        time.sleep(60)
+        logging.info("Sleeping for 30 seconds...")
+        time.sleep(30)
 
 if __name__ == "__main__":
     main()
