@@ -40,7 +40,12 @@ def read_sheet(doc_name: str, sheet: str, _range='all') -> pd.DataFrame:
     else:
         list_content = obj.get(_range)
 
+    # convert to DataFrame with first row as header
     df = pd.DataFrame(list_content)
+    new_header = df.iloc[0]
+    df = df[1:]
+    df.columns = new_header
+
 
     return df
 
@@ -64,8 +69,8 @@ def send_gmail(
     _from: str,
     subject: str,
     message: str,
-    signature=True
-) -> None:
+    signature=True) -> None:
+
     gmail = Gmail() # will open a browser window to ask you to log in and authenticate
 
     params = {
@@ -80,3 +85,37 @@ def send_gmail(
 
     # TODO: try/except block
     message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
+
+def check_health_factors(
+    df: pd.DataFrame, 
+    min_health_factor: float,
+    email_to: str,
+    email_from: str) -> list: 
+    """
+    Looks for column 'Health' in a DataFrame
+    Loops through 'Health' column looking for values below min_health_factor
+    On a hit, sends an email notification
+    """
+
+    if not 'Health' in df.columns:
+        return 
+    
+    positions_healthy = True
+    for i,row in df.iterrows():
+        if row['Health'] < min_health_factor:
+            positions_healthy = False
+            msg = f"Your collateralized debt position on \
+                {row['Protocol']} ({row['Blockchain']}) is \
+                unhealthy with a health factor of {row['Health']}"
+
+            send_gmail(
+                to=email_to,
+                _from=email_from,
+                subject="CDP HEALTH FACTOR ALERT",
+                msg_plain=msg
+            )
+            logging.info(f"Email sent")
+            logging.info(msg)
+    if positions_healthy:
+        logging.info("All positions are healthy")
+        

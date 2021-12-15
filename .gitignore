@@ -1,3 +1,4 @@
 app/*.json
 poc/*.json
 credentials.py
+app/email_addrs.py
