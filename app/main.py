@@ -1,0 +1,16 @@
+import time, logging
+import pandas as pd 
+from utils import *
+
+
+def main():
+    # NOTE: assumes prices are to the right of cells with currency tickers
+    # while True...
+    # search sheet for currency tickers
+    # (think of a better way than looping through all cells)
+    # store in a dict {cell: new_value}
+    # loop through dict and call fill_cell()
+    pass 
+
+if __name__ == "__main__":
+    main()
