@@ -1,7 +1,7 @@
 import pandas as pd
 from pycoingecko import CoinGeckoAPI
 from simplegmail import Gmail
-from currencies import currency_map
+from maps import currency_map
 
 
 def get_current_prices(currencies: list, vs_currencies: list) -> dict:

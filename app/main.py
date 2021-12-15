@@ -32,10 +32,11 @@ def main():
         )
         logging.info(f"Prices fetched for {CURRENCIES}")
 
-        # update keys with tickers instead of CoinGecko coins
+        # make dict with tickers as keys instead of CoinGecko coins
+        ticker_prices_dict = defaultdict()
         for k in prices_dict.keys():
             ticker = currency_map[k]
-            prices_dict[ticker] = prices_dict.pop(k)
+            ticker_prices_dict[ticker] = ticker_prices_dict.pop(k)
 
         # read spreadsheet containing tickers & prices
         df = read_sheet(
@@ -68,7 +69,7 @@ def main():
 
                     # update the adjascent cell with the new price
                     price_coordinate = alphabet_map[j+1] + str(i+1)
-                    new_price = prices_dict[cell]['usd']
+                    new_price = ticker_prices_dict[cell]['usd']
 
                     fill_cell(
                         doc_name=DOC_NAME,
