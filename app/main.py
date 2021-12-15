@@ -10,7 +10,7 @@ import gspread
 
 
 logging.basicConfig(
-    filename="cdp_log.log"
+    filename="cdp_log.log",
     level=logging.DEBUG,
     format="%(asctime)s - %(message)s",
     datefmt="%d-%b-%y %H:%M:%S"
