@@ -103,7 +103,7 @@ def check_health_factors(
     
     positions_healthy = True
     for i,row in df.iterrows():
-        if row['Health'] < min_health_factor:
+        if float(row['Health']) < min_health_factor:
             positions_healthy = False
             msg = f"Your collateralized debt position on \
                 {row['Protocol']} ({row['Blockchain']}) is \
