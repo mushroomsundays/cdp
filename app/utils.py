@@ -115,8 +115,9 @@ def check_health_factors(
                 subject="CDP HEALTH FACTOR ALERT",
                 msg_plain=msg
             )
-            logging.info(f"Email sent")
-            logging.info(msg)
+            
     if positions_healthy:
-        logging.info("All positions are healthy")
+        return True
+
+    return False
         

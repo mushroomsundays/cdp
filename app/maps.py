@@ -2,7 +2,9 @@ currency_map = {
     "bitcoin": "BTC",
     "ethereum": "ETH",
     "avalanche-2": "AVAX",
-    "terra-luna": "LUNA"
+    "terra-luna": "LUNA",
+    "terrausd": "UST",
+    "magic-internet-money": "MIM"
 }
 
 alphabet_map = {

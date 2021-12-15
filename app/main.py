@@ -10,6 +10,7 @@ import gspread
 
 
 logging.basicConfig(
+    filename="cdp_log.log"
     level=logging.DEBUG,
     format="%(asctime)s - %(message)s",
     datefmt="%d-%b-%y %H:%M:%S"
@@ -51,12 +52,17 @@ def main():
         logging.info(f"{SHEET} from {DOC_NAME} read")
 
         # check Health column for factors < MIN_HEALTH_FACTOR
-        check_health_factors(
+        is_healthy = check_health_factors(
             df=df,
             min_health_factor=MIN_HEALTH_FACTOR,
             email_to=email_to,
             email_from=email_from
         )
+
+        if is_healthy:
+            logging.info("All positions are healthy")
+        else:
+            logging.info("POSITION UNHEALTHY; CHECK EMAIL")
 
         # loop through sheet and update prices
         try:
