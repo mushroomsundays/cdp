@@ -15,7 +15,6 @@ def get_current_prices(currencies: list, vs_currencies: list) -> dict:
 
     # ping CoinGecko server
     if cg.ping():
-        logging.info("CoinGecko server status OK")
         
         # TODO: add try/except block
         # what type of exception happens when cg.get_price fails?
@@ -23,7 +22,6 @@ def get_current_prices(currencies: list, vs_currencies: list) -> dict:
         
         return prices_dict
 
-    logging.info("Failed to get prices from CoinGecko API")
     return {}
     
 def read_sheet(doc_name: str, sheet: str, _range='all') -> pd.DataFrame:
@@ -39,18 +37,14 @@ def read_sheet(doc_name: str, sheet: str, _range='all') -> pd.DataFrame:
 
     if _range == 'all':
         list_content = obj.get_all_values()
-        logging.info(f"{sheet} read")
     else:
         list_content = obj.get(_range)
-        logging.info(f"{_range} read from {sheet}")
 
     df = pd.DataFrame(list_content)
 
-    logging.info(f"{df.head()}")
-
     return df
 
-def write_cells(doc_name, sheet, key_cell, value):
+def fill_cell(doc_name, sheet, key_cell, value):
     """
     Fills a single cell in a Google sheet
     """
@@ -61,8 +55,6 @@ def write_cells(doc_name, sheet, key_cell, value):
 
     # update a single cell
     obj.update(key_cell, value)
-
-    logging.info(f"{key_cell} updated to {value}")
 
     # Format the header
     #obj.format('A1:B1', {'textFormat': {'bold': True}})
@@ -88,4 +80,3 @@ def send_gmail(
 
     # TODO: try/except block
     message = gmail.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
-    logging.info(f"Email sent to {to} from {_from}")
