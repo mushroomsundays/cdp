@@ -20,7 +20,7 @@ CURRENCIES = ['bitcoin',
               'ethereum', 
               'avalanche-2', 
               'terra-luna',
-              'terra-usd',
+              'terrausd',
               'magic-internet-money']
               
 DOC_NAME = 'defi_master'
