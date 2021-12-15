@@ -1,6 +1,7 @@
 import pandas as pd
 from pycoingecko import CoinGeckoAPI
 from simplegmail import Gmail
+import gspread
 from maps import currency_map
 
 

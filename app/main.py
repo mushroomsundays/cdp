@@ -4,6 +4,10 @@ from collections import defaultdict
 from utils import *
 from maps import currency_map, alphabet_map
 from email_addrs import email_to, email_from
+from pycoingecko import CoinGeckoAPI
+from simplegmail import Gmail
+import gspread
+
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -34,9 +38,9 @@ def main():
 
         # make dict with tickers as keys instead of CoinGecko coins
         ticker_prices_dict = defaultdict()
-        for k in prices_dict.keys():
+        for i,k in enumerate(prices_dict.keys()):
             ticker = currency_map[k]
-            ticker_prices_dict[ticker] = ticker_prices_dict.pop(k)
+            ticker_prices_dict[ticker] = prices_dict[k]
 
         # read spreadsheet containing tickers & prices
         df = read_sheet(
