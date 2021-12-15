@@ -2,4 +2,5 @@ app/*.json
 poc/*.json
 credentials.py
 app/email_addrs.py
-app/__pycache__/*
+*.pyc
+app/*.log

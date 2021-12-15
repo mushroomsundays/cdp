@@ -16,7 +16,13 @@ logging.basicConfig(
     datefmt="%d-%b-%y %H:%M:%S"
 )
 
-CURRENCIES = ['bitcoin', 'ethereum', 'avalanche-2', 'terra-luna']
+CURRENCIES = ['bitcoin', 
+              'ethereum', 
+              'avalanche-2', 
+              'terra-luna',
+              'terra-usd',
+              'magic-internet-money']
+              
 DOC_NAME = 'defi_master'
 SHEET = 'sheet1'
 MIN_HEALTH_FACTOR = 2
