@@ -1,16 +1,24 @@
 import gspread
+import pandas as pd
 
 # NOTE: gspread uses 'sheet1', 'sheet2' etc instead of actual sheet name
 
-def read_cells(doc_name, sheet, _range):
+def read_sheet(doc_name, sheet, _range='all'):
 
     # create gspread client
-    # service account credentials are stored here: '~/.config/gspread/service_account.json'
+    # service account credentials are stored here: 
+    # '~/.config/gspread/service_account.json'
     gc = gspread.service_account()
 
     doc = gc.open(doc_name)
     obj = getattr(doc, sheet)
-    content = obj.get(_range)
+
+    if _range == 'all':
+        content = obj.get_all_values()
+        df = pd.DataFrame(content)
+        print(df)
+    else:
+        content = obj.get(_range)
 
     print(content)
 
@@ -32,10 +40,10 @@ def write_cells(doc_name, sheet, key_cell, value):
 
 def main():
 
-    read_cells(
+    read_sheet(
         doc_name='api_test',
         sheet='sheet1',
-        _range='A:A',
+        _range='all',
     )
 
     # write a single cell

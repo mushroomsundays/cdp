@@ -1,3 +1,3 @@
-app/client_secret.json 
-app/gmail_token.json
+app/*.json
+poc/*.json
 credentials.py

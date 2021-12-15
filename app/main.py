@@ -2,6 +2,11 @@ import time, logging
 import pandas as pd 
 from utils import *
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(message)s",
+    datefmt="%d-%b-%y %H:%M:%S"
+)
 
 def main():
     # NOTE: assumes prices are to the right of cells with currency tickers
