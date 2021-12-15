@@ -64,6 +64,7 @@ def main():
             email_to=email_to,
             email_from=email_from
         )
+        time.sleep(3)
 
         if is_healthy:
             logging.info("All positions are healthy")
