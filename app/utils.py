@@ -117,7 +117,7 @@ def check_health_factors(
                 to=email_to,
                 _from=email_from,
                 subject="CDP HEALTH FACTOR ALERT",
-                msg_plain=msg
+                message=msg
             )
             
     if positions_healthy:
