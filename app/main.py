@@ -35,7 +35,11 @@ DOC_NAME = 'defi_master'
 SHEET = 'sheet1'
 MIN_HEALTH_FACTOR = 1.8
 
+def get_prices():
+    pass 
 
+def update_sheet():
+    pass
 
 def main():
     # NOTE: assumes prices are to the right of cells with currency tickers
