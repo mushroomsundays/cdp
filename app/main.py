@@ -38,6 +38,8 @@ def main():
     # (think of a better way than looping through all cells)
     # store in a dict {cell: new_value}
     # loop through dict and call fill_cell()
+
+    global MIN_HEALTH_FACTOR
     
     while True:
         # get current crypto prices
