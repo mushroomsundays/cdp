@@ -8,6 +8,10 @@ from pycoingecko import CoinGeckoAPI
 from simplegmail import Gmail
 import gspread
 
+# TODO: figure out a delay schedule for emails
+# use is_healthy
+# potentially decrease MIN_HEALTH_FACTOR after email?
+
 
 logging.basicConfig(
     filename="cdp_log.log",
@@ -70,6 +74,10 @@ def main():
             logging.info("All positions are healthy")
         else:
             logging.info("POSITION UNHEALTHY; CHECK EMAIL")
+            
+            # decrease min health factor by 10% after an email
+            MIN_HEALTH_FACTOR = MIN_HEALTH_FACTOR * 0.9
+            logging.info(f"Minimum health factor decreased to {MIN_HEALTH_FACTOR}")
 
         # loop through sheet and update prices
         try:
@@ -97,8 +105,8 @@ def main():
                     logging.info(f"{price_coordinate} updated to {new_price}. Sleeping for 3s...")
                     time.sleep(3)
 
-        logging.info("Sleeping for 30 seconds...")
-        time.sleep(30)
+        logging.info("Sleeping for 60 seconds...")
+        time.sleep(60)
 
 if __name__ == "__main__":
     main()
