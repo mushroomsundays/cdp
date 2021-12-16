@@ -81,7 +81,7 @@ def send_gmail(
     "subject": subject,
     #"msg_html": "<h1>Woah, my first email!</h1><br />This is an HTML email.",
     #"msg_plain": "Hi\nThis is a plain text email.",
-    "msg_plain": message,
+    "msg_html": message,
     "signature": signature  # use my account signature
     }
 
