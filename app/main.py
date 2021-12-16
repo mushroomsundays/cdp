@@ -8,9 +8,13 @@ from pycoingecko import CoinGeckoAPI
 from simplegmail import Gmail
 import gspread
 
-# TODO: figure out a delay schedule for emails
-# use is_healthy
-# potentially decrease MIN_HEALTH_FACTOR after email?
+# TODO: sleep & restart loop when terminated
+# TODO: add try/except sleep & retry around all API calls
+
+# NOTE: 
+# 1. ConnectionResetError
+# 2. urllib3.exceptions.ProtocolError
+# 3. requests.exceptions.ConnectionError
 
 
 logging.basicConfig(
@@ -29,7 +33,7 @@ CURRENCIES = ['bitcoin',
               
 DOC_NAME = 'defi_master'
 SHEET = 'sheet1'
-MIN_HEALTH_FACTOR = 2
+MIN_HEALTH_FACTOR = 1.8
 
 def main():
     # NOTE: assumes prices are to the right of cells with currency tickers
@@ -43,11 +47,21 @@ def main():
     
     while True:
         # get current crypto prices
-        prices_dict = get_current_prices(
-            currencies=CURRENCIES,
-            vs_currencies='usd'
-        )
-        logging.info(f"Prices fetched for {CURRENCIES}")
+        # try 3 times with 30s sleep in between
+        num_tries = 3
+        while num_tries > 0:
+            try:
+                prices_dict = get_current_prices(
+                    currencies=CURRENCIES,
+                    vs_currencies='usd'
+                )
+                # continue when we successfully get prices
+                num_tries = 0
+                logging.info(f"Prices fetched for {CURRENCIES}")
+            except ConnectionResetError:
+                logging.info(f"CoinGecko ping failed. Waiting 30s...")
+                num_tries -= 1
+                time.sleep(30)
 
         # make dict with tickers as keys instead of CoinGecko coins
         ticker_prices_dict = defaultdict()
@@ -64,6 +78,8 @@ def main():
         logging.info(f"{SHEET} from {DOC_NAME} read")
 
         # check Health column for factors < MIN_HEALTH_FACTOR
+        # TODO: health factor stayed at 1.9 after error and restart
+        # TODO: can I do health factor check AFTER looping through sheet?
         is_healthy = check_health_factors(
             df=df,
             min_health_factor=MIN_HEALTH_FACTOR,
@@ -109,6 +125,8 @@ def main():
 
         logging.info("Sleeping for 60 seconds...")
         time.sleep(60)
+
+    # TODO: send email on termination; sleep for X and then retry
 
 if __name__ == "__main__":
     main()
