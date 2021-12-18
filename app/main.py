@@ -24,12 +24,7 @@ logging.basicConfig(
     datefmt="%d-%b-%y %H:%M:%S"
 )
 
-CURRENCIES = ['bitcoin', 
-              'ethereum', 
-              'avalanche-2', 
-              'terra-luna',
-              'terrausd',
-              'magic-internet-money']
+CURRENCIES = [ k for k in currency_map.keys() ]
               
 DOC_NAME = 'defi_master'
 SHEET = 'sheet1'
