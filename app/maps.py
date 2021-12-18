@@ -4,7 +4,8 @@ currency_map = {
     "avalanche-2": "AVAX",
     "terra-luna": "LUNA",
     "terrausd": "UST",
-    "magic-internet-money": "MIM"
+    "magic-internet-money": "MIM",
+    "dai": "DAI"
 }
 
 alphabet_map = {
