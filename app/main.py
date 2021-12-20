@@ -24,8 +24,7 @@ logging.basicConfig(
     datefmt="%d-%b-%y %H:%M:%S"
 )
 
-CURRENCIES = [ k for k in currency_map.keys() ]
-              
+CURRENCIES = [ k for k in currency_map.keys() ]           
 DOC_NAME = 'defi_master'
 SHEET = 'sheet1'
 MIN_HEALTH_FACTOR = 1.8
@@ -108,7 +107,12 @@ def main():
         logging.info(f"{SHEET} from {DOC_NAME} read")
 
         # update prices
-        update_sheet(df, ticker_prices_dict)
+        try:
+            update_sheet(df, ticker_prices_dict)
+        except gspread.exceptions.APIError:
+            logging.info("gspread encountered an API error; trying again in 30 seconds")
+            time.sleep(30)
+            continue
 
         # read sheet again before checking health factors
 
