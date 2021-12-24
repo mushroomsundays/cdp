@@ -1,5 +1,6 @@
 import time, logging
 import pandas as pd 
+from datetime import datetime
 from collections import defaultdict
 from utils import *
 from maps import currency_map, alphabet_map
@@ -75,12 +76,21 @@ def update_sheet(df: pd.DataFrame, ticker_prices_dict: dict) -> None:
                 # update the adjascent cell with the new price
                 price_coordinate = alphabet_map[j+1] + str(i+1)
                 new_price = ticker_prices_dict[cell]['usd']
-
                 fill_cell(
                     doc_name=DOC_NAME,
                     sheet=SHEET,
                     key_cell=price_coordinate,
                     value=new_price
+                )
+
+                # update 'Last Updated' column with timestamp
+                timestamp_coordinate = alphabet_map[j+2] + str(i+1)
+                _timestamp = datetime.now().strftime("%H:%M:%S (%Y-%m-%d)")
+                fill_cell(
+                    doc_name=DOC_NAME,
+                    sheet=SHEET,
+                    key_cell=timestamp_coordinate,
+                    value=_timestamp
                 )
                 logging.info(f"{price_coordinate} updated to {new_price}. Sleeping for 3s...")
                 time.sleep(3)
