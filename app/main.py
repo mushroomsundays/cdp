@@ -27,7 +27,8 @@ logging.basicConfig(
 
 CURRENCIES = [ k for k in currency_map.keys() ]           
 DOC_NAME = 'defi_master'
-SHEET = 'sheet1'
+PRICES_SHEET = 'asset_prices'
+CDP_SHEET = 'CDPs'
 MIN_HEALTH_FACTOR = 1.8
 
 def get_prices(num_tries=3, delay=30):
@@ -78,7 +79,7 @@ def update_sheet(df: pd.DataFrame, ticker_prices_dict: dict) -> None:
                 new_price = ticker_prices_dict[cell]['usd']
                 fill_cell(
                     doc_name=DOC_NAME,
-                    sheet=SHEET,
+                    sheet_name=PRICES_SHEET,
                     key_cell=price_coordinate,
                     value=new_price
                 )
@@ -88,7 +89,7 @@ def update_sheet(df: pd.DataFrame, ticker_prices_dict: dict) -> None:
                 _timestamp = datetime.now().strftime("%H:%M:%S (%Y-%m-%d)")
                 fill_cell(
                     doc_name=DOC_NAME,
-                    sheet=SHEET,
+                    sheet_name=PRICES_SHEET,
                     key_cell=timestamp_coordinate,
                     value=_timestamp
                 )
@@ -109,27 +110,32 @@ def main():
         ticker_prices_dict = get_prices()
 
         # read current sheet and update prices
-        df = read_sheet(
+        prices_df = read_sheet(
             doc_name=DOC_NAME,
-            sheet=SHEET,
+            sheet_name=PRICES_SHEET,
             _range='all'
         )
-        logging.info(f"{SHEET} from {DOC_NAME} read")
+        logging.info(f"{PRICES_SHEET} from {DOC_NAME} read")
 
         # update prices
         try:
-            update_sheet(df, ticker_prices_dict)
+            update_sheet(prices_df, ticker_prices_dict)
         except gspread.exceptions.APIError:
             logging.info("gspread encountered an API error; trying again in 30 seconds")
             time.sleep(30)
             continue
 
-        # read sheet again before checking health factors
+        # read sheet with position health
+        cdp_df = read_sheet(
+            doc_name=DOC_NAME,
+            sheet_name=CDP_SHEET,
+            _range='all'
+        )
 
         # MIN_HEALTH_FACTOR decreases by 10% every time an email is sent
         logging.info("Checking health factors...")
         is_healthy = check_health_factors(
-            df=df,
+            df=cdp_df,
             min_health_factor=MIN_HEALTH_FACTOR,
             email_to=email_to,
             email_from=email_from

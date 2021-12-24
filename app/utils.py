@@ -26,7 +26,7 @@ def get_current_prices(currencies: list, vs_currencies: list) -> dict:
 
     return {}
     
-def read_sheet(doc_name: str, sheet: str, _range='all') -> pd.DataFrame:
+def read_sheet(doc_name: str, sheet_name: str, _range='all') -> pd.DataFrame:
     """
     Read a spreadsheet (or a range of cells) into a Pandas DataFrame
     """
@@ -35,12 +35,12 @@ def read_sheet(doc_name: str, sheet: str, _range='all') -> pd.DataFrame:
     gc = gspread.service_account()
 
     doc = gc.open(doc_name)
-    obj = getattr(doc, sheet)
+    worksheet = doc.worksheet(sheet_name)
 
     if _range == 'all':
-        list_content = obj.get_all_values()
+        list_content = worksheet.get_all_values()
     else:
-        list_content = obj.get(_range)
+        list_content = worksheet.get(_range)
 
     # convert to DataFrame with first row as header
     df = pd.DataFrame(list_content)
@@ -51,20 +51,20 @@ def read_sheet(doc_name: str, sheet: str, _range='all') -> pd.DataFrame:
 
     return df
 
-def fill_cell(doc_name, sheet, key_cell, value):
+def fill_cell(doc_name, sheet_name, key_cell, value):
     """
     Fills a single cell in a Google sheet
     """
 
     gc = gspread.service_account()
     doc = gc.open(doc_name)
-    obj = getattr(doc, sheet)
+    worksheet = doc.worksheet(sheet_name)
 
     # update a single cell
-    obj.update(key_cell, value)
+    worksheet.update(key_cell, value)
 
     # Format the header
-    #obj.format('A1:B1', {'textFormat': {'bold': True}})
+    #worksheet.format('A1:B1', {'textFormat': {'bold': True}})
 
 def send_gmail(
     to: str,
