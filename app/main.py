@@ -1,10 +1,16 @@
+# general
 import time, logging
 import pandas as pd 
 from datetime import datetime
 from collections import defaultdict
+from urllib3.exceptions import ReadTimeoutError
+
+# local
 from utils import *
 from maps import currency_map, alphabet_map
 from email_addrs import email_to, email_from
+
+# API libraries
 from pycoingecko import CoinGeckoAPI
 from simplegmail import Gmail
 import gspread
@@ -16,6 +22,74 @@ import gspread
 # 1. ConnectionResetError
 # 2. urllib3.exceptions.ProtocolError
 # 3. requests.exceptions.ConnectionError
+
+"""
+Traceback (most recent call last):
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/urllib3/connection.py", line 169, in _new_conn
+    conn = connection.create_connection(
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+  File "/usr/lib/python3.8/socket.py", line 918, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+socket.gaierror: [Errno -3] Temporary failure in name resolution
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 699, in urlopen
+    httplib_response = self._make_request(
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 382, in _make_request
+    self._validate_conn(conn)
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 1010, in _validate_conn
+    conn.connect()
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/urllib3/connection.py", line 353, in connect
+    conn = self._new_conn()
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/urllib3/connection.py", line 181, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPSConnection object at 0x7f93d7596760>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/requests/adapters.py", line 439, in send
+    resp = conn.urlopen(
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/urllib3/connectionpool.py", line 755, in urlopen
+    retries = retries.increment(
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/urllib3/util/retry.py", line 573, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='sheets.googleapis.com', port=443): Max retries exceeded with url: /v4/spreadsheets/1vnADeRKAhCnK5HSRyoz5ValE_zjZyKCcANSsg-0w0uk?includeGridData=false (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f93d7596760>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "main.py", line 159, in <module>
+    main()
+  File "main.py", line 122, in main
+    update_sheet(prices_df, ticker_prices_dict)
+  File "main.py", line 90, in update_sheet
+    fill_cell(
+  File "/home/jmoore87jr/crypto/cdp2/app/utils.py", line 60, in fill_cell
+    doc = gc.open(doc_name)
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/gspread/client.py", line 127, in open
+    return Spreadsheet(self, properties)
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/gspread/spreadsheet.py", line 33, in __init__
+    metadata = self.fetch_sheet_metadata()
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/gspread/spreadsheet.py", line 243, in fetch_sheet_metadata
+    r = self.client.request("get", url, params=params)
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/gspread/client.py", line 59, in request
+    response = getattr(self.session, method)(
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/requests/sessions.py", line 555, in get
+    return self.request('GET', url, **kwargs)
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/google/auth/transport/requests.py", line 480, in request
+    response = super(AuthorizedSession, self).request(
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/requests/sessions.py", line 542, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/requests/sessions.py", line 655, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/jmoore87jr/.virtualenvs/cryptoenv/lib/python3.8/site-packages/requests/adapters.py", line 516, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='sheets.googleapis.com', port=443): Max retries exceeded with url: /v4/spreadsheets/1vnADeRKAhCnK5HSRyoz5ValE_zjZyKCcANSsg-0w0uk?includeGridData=false (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f93d7596760>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution'))
+"""
 
 
 logging.basicConfig(
@@ -110,27 +184,37 @@ def main():
         ticker_prices_dict = get_prices()
 
         # read current sheet and update prices
-        prices_df = read_sheet(
-            doc_name=DOC_NAME,
-            sheet_name=PRICES_SHEET,
-            _range='all'
-        )
-        logging.info(f"{PRICES_SHEET} from {DOC_NAME} read")
+        try:
+            prices_df = read_sheet(
+                doc_name=DOC_NAME,
+                sheet_name=PRICES_SHEET,
+                _range='all'
+            )
+            logging.info(f"{PRICES_SHEET} from {DOC_NAME} read")
+        except ReadTimeoutError:
+            logging.info("API error; trying again in 120 seconds")
+            time.sleep(120)
+            continue
 
         # update prices
         try:
             update_sheet(prices_df, ticker_prices_dict)
-        except gspread.exceptions.APIError:
-            logging.info("gspread encountered an API error; trying again in 30 seconds")
-            time.sleep(30)
+        except ReadTimeoutError:
+            logging.info("API error; trying again in 120 seconds")
+            time.sleep(120)
             continue
 
         # read sheet with position health
-        cdp_df = read_sheet(
-            doc_name=DOC_NAME,
-            sheet_name=CDP_SHEET,
-            _range='all'
-        )
+        try:
+            cdp_df = read_sheet(
+                doc_name=DOC_NAME,
+                sheet_name=CDP_SHEET,
+                _range='all'
+            )
+        except ReadTimeoutError:
+            logging.info("API error; trying again in 120 seconds")
+            time.sleep(120)
+            continue
 
         # MIN_HEALTH_FACTOR decreases by 10% every time an email is sent
         logging.info("Checking health factors...")
